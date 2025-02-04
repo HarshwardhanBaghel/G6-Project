@@ -74,31 +74,41 @@ pipeline {
             }
         }
 
-        stage('Update Deployment File') {
+        sstage('Update Deployment File') {
     steps {
         withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
             sh '''
                 git config --global user.email "gudduharsh29@gmail.com"
                 git config --global user.name "HarshwardhanBaghel"
                 
-                # Discard any local changes
-                git reset --hard
+                # Stash any local changes before pulling
+                git stash save "temporary changes"
                 
-                # Pull the latest changes
+                # Pull the latest changes from the main branch
                 git pull --rebase origin main
                 
-                # Update image tag in deployment.yml
+                # Ensure the placeholder exists in the deployment.yml file
+                if ! grep -q 'replaceImageTag' deployment/deployment.yml; then
+                    echo "replaceImageTag placeholder not found. Adding it back."
+                    sed -i 's/image: .*/image: blackopsgun\/pet-clinic:replaceImageTag/' deployment/deployment.yml
+                fi
+                
+                # Update image tag in deployment.yml with the build number
                 sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" deployment/deployment.yml
                 
-                # Check if there are changes
-                git diff --quiet || (git add ${DEPLOYMENT_FILE} && git commit -m "Update deployment image to version ${BUILD_NUMBER}")
+                # Check if there are changes to commit
+                git diff --quiet || (git add deployment/deployment.yml && git commit -m "Update deployment image to version ${BUILD_NUMBER}")
                 
-                # Push the changes
+                # Push the changes to the remote repository
                 git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                
+                # Apply stashed changes (if any)
+                git stash pop
             '''
         }
     }
 }
+
 
     }
 
