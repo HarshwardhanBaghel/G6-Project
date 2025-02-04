@@ -8,92 +8,85 @@ pipeline {
 
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
+        DOCKER_CREDENTIALS_ID = 'docker-hub'
+        DOCKER_IMAGE = 'blackopsgun/pet-clinic'
+        DOCKER_TAG = 'latest'
     }
 
     stages {
-        stage('Git Checkout') {
+        stage('Checkout Code') {
             steps {
-                git branch: 'main', changelog: false, poll: false, url: 'https://github.com/HarshwardhanBaghel/G6-Project.git'
+                git branch: 'main', url: 'https://github.com/HarshwardhanBaghel/G6-Project.git'
             }
         }
 
-        stage('Code compile') {
+        stage('Compile Code') {
             steps {
-                sh "mvn clean compile"
+                sh 'mvn clean compile'
             }
         }
 
-        stage('Unit Test') {
+        stage('Run Unit Tests') {
             steps {
-                sh "mvn test"
+                sh 'mvn test'
             }
         }
 
-        stage('sonar-scanner') {
+        stage('Static Code Analysis') {
             steps {
-                withSonarQubeEnv(credentialsId: 'new-ver-sonar', installationName: 'Sonar-server') {
+                withSonarQubeEnv('Sonar-server') {
                     sh '''
-                        $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Petclinic \
-                        -Dsonar.exclusions=**/*.java \
-                        -Dsonar.projectKey=Petclinic
+                        ${SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.projectKey=Petclinic \
+                        -Dsonar.projectName=Petclinic \
+                        -Dsonar.sources=src \
+                        -Dsonar.java.binaries=target/classes
                     '''
                 }
             }
         }
 
-        stage('OWASP Scan') {
+        stage('Dependency Vulnerability Scan') {
             steps {
-                // Run the Dependency-Check scan and generate an XML report
                 dependencyCheck additionalArguments: '--scan ./ --format XML --out .', odcInstallation: 'DP-check'
-
-                // Publish the generated XML report
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
 
         stage('Build Artifact') {
             steps {
-                sh "mvn clean install"
+                sh 'mvn clean package'
             }
         }
 
-        stage('Docker Build') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker-hub', toolName: 'docker') {
-                        // Build Docker image
-                        sh "docker build -t petclinicg ."
+                    docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('', DOCKER_CREDENTIALS_ID) {
+                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
                     }
                 }
             }
         }
 
-        stage('Docker Tag & Push') {
-            steps {
-                script {
-                    withDockerRegistry(credentialsId: 'docker-hub', toolName: 'docker') {
-                        // Tag Docker image with a version (e.g., build number or commit ID)
-                        def imageTag = "blackopsgun/pet-clinicg:latest"
-                        sh "docker tag petclinicg $imageTag"
-
-                        // Push to Docker Hub
-                        sh "docker push $imageTag"
-                    }
-                }
-            }
+    post {
+        success {
+            mail to: 'gudduharsh29@gmail.com',
+                 subject: "SUCCESS: Build ${env.BUILD_NUMBER}",
+                 body: "The build was successful. Check the details at ${env.BUILD_URL}"
         }
-
-        stage('Docker Deploy') {
-            steps {
-                script {
-                    // Deploy the container
-                    def containerName = "petg"
-                    sh "docker run -d --name $containerName -p 8082:8080 blackopsgun/pet-clinicg:latest"
-
-                    // Optionally, verify if the container is running (you could also use docker ps to confirm)
-                    sh "docker ps -f name=$containerName"
-                }
-            }
+        failure {
+            mail to: 'gudduharsh29@gmail.com',
+                 subject: "FAILURE: Build ${env.BUILD_NUMBER}",
+                 body: "The build failed. Check the details at ${env.BUILD_URL}"
         }
     }
 }
