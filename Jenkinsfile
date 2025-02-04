@@ -10,14 +10,17 @@ pipeline {
         SCANNER_HOME = tool 'sonar-scanner'
         DOCKER_CREDENTIALS_ID = 'docker-hub'
         DOCKER_IMAGE = 'blackopsgun/pet-clinic'
-        DOCKER_TAG = "build-${env.BUILD_NUMBER}"  // Correct usage of curly braces
+        DOCKER_TAG = "build-${env.BUILD_NUMBER}"  // Unique build tag
         LATEST_TAG = "latest"
+        DEPLOYMENT_FILE = "deployment/deployment.yml"
+        GIT_USER_NAME = "HarshwardhanBaghel"
+        GIT_REPO_NAME = "G6-Project"
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/HarshwardhanBaghel/G6-Project.git'
+                git branch: 'main', url: "https://github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git"
             }
         }
 
@@ -60,26 +63,36 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}") // Unique tag
-                    docker.build("${DOCKER_IMAGE}:${LATEST_TAG}") // Latest tag
-                }
-            }
-        }
-
-        stage('Push Docker Image') {
+        stage('Build and Push Docker Image') {
             steps {
                 script {
                     docker.withRegistry('', DOCKER_CREDENTIALS_ID) {
-                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
-                        docker.image("${DOCKER_IMAGE}:${LATEST_TAG}").push()
+                        def appImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                        sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:${LATEST_TAG}"
+                        appImage.push()
+                        sh "docker push ${DOCKER_IMAGE}:${LATEST_TAG}"
                     }
                 }
             }
         }
 
+        stage('Update Deployment File') {
+            steps {
+                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                    sh '''
+                        git config --global user.email "gudduharsh29@gmail.com"
+                        git config --global user.name "HarshwardhanBaghel"
+
+                        # Update image tag in deployment.yml
+                        sed -i "s|image: blackopsgun/pet-clinic:.*|image: blackopsgun/pet-clinic:${BUILD_NUMBER}|" ${DEPLOYMENT_FILE}
+
+                        git add ${DEPLOYMENT_FILE}
+                        git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                        git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    '''
+                }
+            }
+        }
     }
 
     post {
