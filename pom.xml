@@ -375,67 +375,25 @@
                 </configuration>
             </plugin>
 
-            <properties>
-    <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin> <!-- Define the version here -->
-</properties>
-
-<build>
-    <defaultGoal>install</defaultGoal>
-    <finalName>petclinic</finalName>
-    <resources>
-        <resource>
-            <directory>${basedir}/src/main/resources</directory>
-            <filtering>true</filtering>
-        </resource>
-    </resources>
-    <testResources>
-        <testResource>
-            <directory>${project.basedir}/src/test/java</directory>
-        </testResource>
-        <testResource>
-            <directory>${project.basedir}/src/test/resources</directory>
-        </testResource>
-    </testResources>
-    <plugins>
-        <!-- Jacoco Plugin for code coverage -->
-        <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.8.7</version> <!-- Use a stable version like 0.8.7 -->
-            <executions>
-                <!-- First execution: preparing the agent during test phase -->
-                <execution>
-                    <goals>
-                        <goal>prepare-agent</goal> <!-- Collect coverage data -->
-                    </goals>
-                    <phase>test</phase> <!-- Run during the test phase -->
-                </execution>
-
-                <!-- Second execution: Generate report after tests -->
-                <execution>
-                    <id>report</id>
-                    <phase>verify</phase> <!-- Generate report after tests are complete -->
-                    <goals>
-                        <goal>report</goal> <!-- Generate coverage report -->
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-
-        <!-- Maven Compiler Plugin -->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>${maven-compiler-plugin.version}</version>
-        </plugin>
-
-        <!-- Other plugins remain as is... -->
-
-    </plugins>
-</build>
-
-
-
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
             <!--Specify the encoding for copying resources-->
             <plugin>
