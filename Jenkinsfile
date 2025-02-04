@@ -74,7 +74,7 @@ pipeline {
                     withDockerRegistry(credentialsId: 'docker-hub', toolName: 'docker') {
                         // Tag Docker image with a version (e.g., build number or commit ID)
                         def imageTag = "blackopsgun/pet-clinicg:latest"
-                        sh "docker tag petclinic1 $imageTag"
+                        sh "docker tag petclinicg $imageTag"
 
                         // Push to Docker Hub
                         sh "docker push $imageTag"
