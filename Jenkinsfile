@@ -9,8 +9,9 @@ pipeline {
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
         DOCKER_CREDENTIALS_ID = 'docker-hub'
-        DOCKER_IMAGE = 'blackopsgun/pet-clinic'
-        DOCKER_TAG = 'latest'
+        DOCKER_IMAGE = 'blackopsgun/pet-clinicG'
+        DOCKER_TAG = "build-${env.BUILD_NUMBER}"  // Correct usage of curly braces
+        LATEST_TAG = "latest"
     }
 
     stages {
@@ -62,7 +63,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                    docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}") // Unique tag
+                    docker.build("${DOCKER_IMAGE}:${LATEST_TAG}") // Latest tag
                 }
             }
         }
@@ -72,16 +74,19 @@ pipeline {
                 script {
                     docker.withRegistry('', DOCKER_CREDENTIALS_ID) {
                         docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
+                        docker.image("${DOCKER_IMAGE}:${LATEST_TAG}").push()
                     }
                 }
             }
         }
 
+    }
+
     post {
         success {
             mail to: 'gudduharsh29@gmail.com',
                  subject: "SUCCESS: Build ${env.BUILD_NUMBER}",
-                 body: "The build was successful. Check the details at ${env.BUILD_URL}"
+                 body: "The build was successful. Docker image: ${DOCKER_IMAGE}:${DOCKER_TAG}. Check the details at ${env.BUILD_URL}"
         }
         failure {
             mail to: 'gudduharsh29@gmail.com',
