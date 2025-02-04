@@ -77,23 +77,28 @@ pipeline {
         }
 
         stage('Update Deployment File') {
-            steps {
-                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
-                    sh '''
-                        git config --global user.email "gudduharsh29@gmail.com"
-                        git config --global user.name "HarshwardhanBaghel"
-
-                        # Update image tag in deployment.yml
-                        sed -i "s|image: blackopsgun/pet-clinic:.*|image: blackopsgun/pet-clinic:${BUILD_NUMBER}|" ${DEPLOYMENT_FILE}
-
-                        git add ${DEPLOYMENT_FILE}
-                        git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                        git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-                    '''
-                }
-            }
+    steps {
+        withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+            sh '''
+                git config --global user.email "gudduharsh29@gmail.com"
+                git config --global user.name "HarshwardhanBaghel"
+                
+                # Pull the latest changes
+                git pull --rebase origin main
+                
+                # Update image tag in deployment.yml
+                sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" deployment/deployment.yml
+                
+                # Check if there are changes
+                git diff --quiet || (git add ${DEPLOYMENT_FILE} && git commit -m "Update deployment image to version ${BUILD_NUMBER}")
+                
+                # Push the changes
+                git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+            '''
         }
     }
+}
+
 
     post {
         success {
