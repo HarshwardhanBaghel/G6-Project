@@ -9,7 +9,7 @@ pipeline {
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
         DOCKER_CREDENTIALS_ID = 'docker-hub'
-        DOCKER_IMAGE = 'blackopsgun/pet-clinicG'
+        DOCKER_IMAGE = 'blackopsgun/pet-clinic'
         DOCKER_TAG = "build-${env.BUILD_NUMBER}"  // Correct usage of curly braces
         LATEST_TAG = "latest"
     }
