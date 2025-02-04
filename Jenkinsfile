@@ -90,11 +90,11 @@ pipeline {
                 # Ensure the placeholder exists in the deployment.yml file
                 if ! grep -q 'replaceImageTag' deployment/deployment.yml; then
                     echo "replaceImageTag placeholder not found. Adding it back."
-                    sed -i 's/image: .*/image: blackopsgun\/pet-clinic:replaceImageTag/' deployment/deployment.yml
+                    sed -i 's|image: .*|image: blackopsgun/pet-clinic:replaceImageTag|' deployment/deployment.yml
                 fi
                 
                 # Update image tag in deployment.yml with the build number
-                sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" deployment/deployment.yml
+                sed -i "s|replaceImageTag|${BUILD_NUMBER}|g" deployment/deployment.yml
                 
                 # Check if there are changes to commit
                 git diff --quiet || (git add deployment/deployment.yml && git commit -m "Update deployment image to version ${BUILD_NUMBER}")
@@ -108,6 +108,7 @@ pipeline {
         }
     }
 }
+
 
 
 
