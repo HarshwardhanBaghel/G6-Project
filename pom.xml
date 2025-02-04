@@ -380,6 +380,22 @@
 </properties>
 
 <build>
+    <defaultGoal>install</defaultGoal>
+    <finalName>petclinic</finalName>
+    <resources>
+        <resource>
+            <directory>${basedir}/src/main/resources</directory>
+            <filtering>true</filtering>
+        </resource>
+    </resources>
+    <testResources>
+        <testResource>
+            <directory>${project.basedir}/src/test/java</directory>
+        </testResource>
+        <testResource>
+            <directory>${project.basedir}/src/test/resources</directory>
+        </testResource>
+    </testResources>
     <plugins>
         <!-- Jacoco Plugin for code coverage -->
         <plugin>
@@ -405,8 +421,19 @@
                 </execution>
             </executions>
         </plugin>
+
+        <!-- Maven Compiler Plugin -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>${maven-compiler-plugin.version}</version>
+        </plugin>
+
+        <!-- Other plugins remain as is... -->
+
     </plugins>
 </build>
+
 
 
 
