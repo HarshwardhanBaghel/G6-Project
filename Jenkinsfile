@@ -21,6 +21,7 @@ pipeline {
             steps {
                 cleanWs()  // Ensure clean workspace for each build
                 git branch: 'main', url: "https://github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git"
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-account', url: 'https://github.com/HarshwardhanBaghel/G6-Project.git']])
             }
         }
 
