@@ -229,27 +229,45 @@
 
 
 <!-- Webjars -->
-<dependency>
-    <groupId>org.webjars.npm</groupId>
-    <artifactId>minimatch</artifactId>
-    <version>3.1.2</version>
-</dependency>
+ <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>minimatch</artifactId>
+        <version>3.1.2</version>
+    </dependency>
 
-<dependency>
-    <groupId>org.webjars</groupId>
-    <artifactId>jquery</artifactId>
-    <version>3.6.0</version>  <!-- Downgraded -->
-</dependency>
-<dependency>
-    <groupId>org.webjars</groupId>
-    <artifactId>jquery-ui</artifactId>
-    <version>1.12.1</version>  <!-- Downgraded -->
-</dependency>
-<dependency>
-    <groupId>org.webjars</groupId>
-    <artifactId>bootstrap</artifactId>
-    <version>4.6.0</version>  <!-- Downgraded -->
-</dependency>
+    <!-- WebJars with stable versions -->
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>jquery</artifactId>
+        <version>3.6.0</version>  <!-- Downgraded -->
+    </dependency>
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>jquery-ui</artifactId>
+        <version>1.12.1</version>  <!-- Downgraded -->
+    </dependency>
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>bootstrap</artifactId>
+        <version>4.6.0</version>  <!-- Downgraded -->
+    </dependency>
+
+    <!-- Exclude problematic dependencies from wro4j-extensions -->
+    <dependency>
+        <groupId>ro.isdc.wro4j</groupId>
+        <artifactId>wro4j-extensions</artifactId>
+        <version>1.10.1</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.webjars.npm</groupId>
+                <artifactId>jshint</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>org.webjars.npm</groupId>
+                <artifactId>cli</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
 
 
 <!-- Test Artifacts -->
