@@ -457,88 +457,91 @@
             </configuration>
         </plugin>
     </plugins>
-<profile>
-    <id>H2</id>
-    <activation>
-        <activeByDefault>true</activeByDefault>
-    </activation>
-    <properties>
-        <db.script>h2</db.script>
-        <jpa.database>H2</jpa.database>
-        <jdbc.driverClassName>org.h2.Driver</jdbc.driverClassName>
-        <jdbc.url>jdbc:h2:mem:petclinic</jdbc.url>
-        <jdbc.username>sa</jdbc.username>
-        <jdbc.password/>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>2.2.224</version>
-            <scope>runtime</scope>
-        </dependency>
-    </dependencies>
-</profile>
+<profiles>
+    <profile>
+        <id>H2</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
+        <properties>
+            <db.script>h2</db.script>
+            <jpa.database>H2</jpa.database>
+            <jdbc.driverClassName>org.h2.Driver</jdbc.driverClassName>
+            <jdbc.url>jdbc:h2:mem:petclinic</jdbc.url>
+            <jdbc.username>sa</jdbc.username>
+            <jdbc.password/>
+        </properties>
+        <dependencies>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>2.2.224</version>
+                <scope>runtime</scope>
+            </dependency>
+        </dependencies>
+    </profile>
 
-<profile>
-    <id>HSQLDB</id>
-    <properties>
-        <db.script>hsqldb</db.script>
-        <jpa.database>HSQL</jpa.database>
-        <jdbc.driverClassName>org.hsqldb.jdbcDriver</jdbc.driverClassName>
-        <jdbc.url>jdbc:hsqldb:mem:petclinic</jdbc.url>
-        <jdbc.username>sa</jdbc.username>
-        <jdbc.password/>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>2.7.2</version>
-            <scope>runtime</scope>
-        </dependency>
-    </dependencies>
-</profile>
+    <profile>
+        <id>HSQLDB</id>
+        <properties>
+            <db.script>hsqldb</db.script>
+            <jpa.database>HSQL</jpa.database>
+            <jdbc.driverClassName>org.hsqldb.jdbcDriver</jdbc.driverClassName>
+            <jdbc.url>jdbc:hsqldb:mem:petclinic</jdbc.url>
+            <jdbc.username>sa</jdbc.username>
+            <jdbc.password/>
+        </properties>
+        <dependencies>
+            <dependency>
+                <groupId>org.hsqldb</groupId>
+                <artifactId>hsqldb</artifactId>
+                <version>2.7.2</version>
+                <scope>runtime</scope>
+            </dependency>
+        </dependencies>
+    </profile>
 
-<profile>
-    <id>MySQL</id>
-    <properties>
-        <db.script>mysql</db.script>
-        <jpa.database>MYSQL</jpa.database>
-        <jdbc.driverClassName>com.mysql.cj.jdbc.Driver</jdbc.driverClassName>
-        <jdbc.url>jdbc:mysql://localhost:3306/petclinic?useUnicode=true</jdbc.url>
-        <jdbc.username>petclinic</jdbc.username>
-        <jdbc.password>petclinic</jdbc.password>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.2.0</version>
-            <scope>runtime</scope>
-        </dependency>
-    </dependencies>
-</profile>
+    <profile>
+        <id>MySQL</id>
+        <properties>
+            <db.script>mysql</db.script>
+            <jpa.database>MYSQL</jpa.database>
+            <jdbc.driverClassName>com.mysql.cj.jdbc.Driver</jdbc.driverClassName>
+            <jdbc.url>jdbc:mysql://localhost:3306/petclinic?useUnicode=true</jdbc.url>
+            <jdbc.username>petclinic</jdbc.username>
+            <jdbc.password>petclinic</jdbc.password>
+        </properties>
+        <dependencies>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>8.2.0</version>
+                <scope>runtime</scope>
+            </dependency>
+        </dependencies>
+    </profile>
 
-<profile>
-    <id>PostgreSQL</id>
-    <properties>
-        <db.script>postgresql</db.script>
-        <jpa.database>POSTGRESQL</jpa.database>
-        <jdbc.driverClassName>org.postgresql.Driver</jdbc.driverClassName>
-        <jdbc.url>jdbc:postgresql://localhost:5432/petclinic</jdbc.url>
-        <jdbc.username>postgres</jdbc.username>
-        <jdbc.password>petclinic</jdbc.password>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.1</version>
-            <scope>runtime</scope>
-        </dependency>
-    </dependencies>
-</profile>
+    <profile>
+        <id>PostgreSQL</id>
+        <properties>
+            <db.script>postgresql</db.script>
+            <jpa.database>POSTGRESQL</jpa.database>
+            <jdbc.driverClassName>org.postgresql.Driver</jdbc.driverClassName>
+            <jdbc.url>jdbc:postgresql://localhost:5432/petclinic</jdbc.url>
+            <jdbc.username>postgres</jdbc.username>
+            <jdbc.password>petclinic</jdbc.password>
+        </properties>
+        <dependencies>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.7.1</version>
+                <scope>runtime</scope>
+            </dependency>
+        </dependencies>
+    </profile>
+</profiles>
+
 <repositories>
     <repository>
         <id>repository.spring.milestone</id>
@@ -546,6 +549,7 @@
         <url>https://repo.spring.io/milestone</url>
     </repository>
 </repositories>
+
 
 
 </project>
