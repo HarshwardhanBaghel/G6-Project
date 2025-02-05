@@ -457,6 +457,7 @@
             </configuration>
         </plugin>
     </plugins>
+    </build>
 <profiles>
     <profile>
         <id>H2</id>
