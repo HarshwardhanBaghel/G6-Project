@@ -92,7 +92,7 @@ pipeline {
                         fi
 
                         # Update the image tag in deployment.yml
-                        sed -i "s|replaceImageTag|${BUILD_NUMBER}|g" ${DEPLOYMENT_FILE}
+                        sed -i "s|replaceImageTag|build-${BUILD_NUMBER}|g" ${DEPLOYMENT_FILE}
 
                         # Commit and push only if there are changes
                         if ! git diff --quiet; then
