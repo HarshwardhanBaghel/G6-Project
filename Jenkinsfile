@@ -19,9 +19,8 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                cleanWs()  // Ensure clean workspace for each build
-                git branch: 'main', url: "https://github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git"
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-account', url: 'https://github.com/HarshwardhanBaghel/G6-Project.git']])
+                cleanWs()  // Ensure a clean workspace
+                git branch: 'main', credentialsId: 'github-account', url: "https://github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git"
             }
         }
 
@@ -76,43 +75,37 @@ pipeline {
         }
 
         stage('Update Deployment File') {
-    steps {
-        withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
-            sh '''
-                git config --global user.email "gudduharsh29@gmail.com"
-                git config --global user.name "HarshwardhanBaghel"
-                
-                # Stash any local changes before pulling
-                git stash save "temporary changes"
-                
-                # Pull the latest changes from the main branch
-                git pull --rebase origin main
-                
-                # Ensure the placeholder exists in the deployment.yml file
-                if ! grep -q 'replaceImageTag' deployment/deployment.yml; then
-                    echo "replaceImageTag placeholder not found. Adding it back."
-                    sed -i 's|image: .*|image: blackopsgun/pet-clinic:replaceImageTag|' deployment/deployment.yml
-                fi
-                
-                # Update image tag in deployment.yml with the build number
-                sed -i "s|replaceImageTag|${BUILD_NUMBER}|g" deployment/deployment.yml
-                
-                # Check if there are changes to commit
-                git diff --quiet || (git add deployment/deployment.yml && git commit -m "Update deployment image to version ${BUILD_NUMBER}")
-                
-                # Push the changes to the remote repository
-                git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-                
-                # Apply stashed changes (if any)
-                git stash pop
-            '''
+            steps {
+                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                    sh '''
+                        git config --global user.email "gudduharsh29@gmail.com"
+                        git config --global user.name "HarshwardhanBaghel"
+                        
+                        # Reset local changes and pull latest changes
+                        git reset --hard
+                        git pull origin main --rebase
+
+                        # Ensure the placeholder exists in deployment.yml
+                        if ! grep -q 'replaceImageTag' ${DEPLOYMENT_FILE}; then
+                            echo "Placeholder missing, restoring..."
+                            sed -i 's|image: .*|image: blackopsgun/pet-clinic:replaceImageTag|' ${DEPLOYMENT_FILE}
+                        fi
+
+                        # Update the image tag in deployment.yml
+                        sed -i "s|replaceImageTag|${BUILD_NUMBER}|g" ${DEPLOYMENT_FILE}
+
+                        # Commit and push only if there are changes
+                        if ! git diff --quiet; then
+                            git add ${DEPLOYMENT_FILE}
+                            git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                            git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git HEAD:main
+                        else
+                            echo "No changes to commit."
+                        fi
+                    '''
+                }
+            }
         }
-    }
-}
-
-
-
-
     }
 
     post {
