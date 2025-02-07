@@ -52,10 +52,11 @@ pipeline {
 
         stage('Dependency Vulnerability Scan') {
             steps {
-                dependencyCheck additionalArguments: '--scan ./ --format XML --out .', odcInstallation: 'DP-check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                dependencyCheck additionalArguments: '--scan ./ --format HTML --out .', odcInstallation: 'DP-check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.html'
             }
         }
+
 
         stage('Build Artifact') {
             steps {
