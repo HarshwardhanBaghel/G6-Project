@@ -50,15 +50,20 @@ pipeline {
             }
         }
 
-        stage('Build and Push Docker Image') {
+            stage('Build & Push Docker Image') {
             steps {
-                script {
-                    docker.withRegistry('', DOCKER_CREDENTIALS_ID) {
-                        docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
-                    }
+                withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh """
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                        docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                        docker logout
+                    """
                 }
             }
         }
+
+
 
         stage('Update Deployment File') {
             steps {
