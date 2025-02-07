@@ -28,11 +28,22 @@ pipeline {
             }
         }
 
-        stage('Static & Dependency Analysis') {
+        stage('Static Code Analysis') {
             steps {
                 withSonarQubeEnv('Sonar-server') {
-                    sh '${tool("sonar-scanner")}/bin/sonar-scanner -Dsonar.projectKey=Petclinic -Dsonar.sources=src'
+                    sh '''
+                        ${SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.projectKey=Petclinic \
+                        -Dsonar.projectName=Petclinic \
+                        -Dsonar.sources=src \
+                        -Dsonar.java.binaries=target/classes
+                    '''
                 }
+            }
+        }
+
+        stage('Dependency Vulnerability Scan') {
+            steps {
                 dependencyCheck additionalArguments: '--scan ./ --format HTML --out .', odcInstallation: 'DP-check'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.html'
             }
