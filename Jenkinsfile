@@ -36,7 +36,7 @@ pipeline {
                         ${SCANNER_HOME}/bin/sonar-scanner \
                         -Dsonar.projectKey=Petclinic \
                         -Dsonar.projectName=Petclinic \
-                        -Dsonar.sources=src \
+                        -Dsonar.sources=. \
                         -Dsonar.java.binaries=target/classes
                     '''
                 }
